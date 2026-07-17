@@ -1,0 +1,29 @@
+# ── SECRETS — NEVER COMMIT ──
+.env
+*.env.local
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+.venv/
+venv/
+env/
+# ── Node / React ──
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.log
+npm-debug.log*
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+# ── Docker ──
+.docker/

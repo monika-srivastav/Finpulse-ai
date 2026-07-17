@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  # ── Backend (FastAPI) ──
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Note: In this single-container setup, FastAPI serves the React build.
+# The Dockerfile builds React first, then copies it into the Python image.
+# For local development WITHOUT Docker, run both separately (see README).
