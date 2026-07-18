@@ -59,6 +59,7 @@ export default function App() {
   const formData = new FormData();
   formData.append("text_data", textData);
   formData.append("query", query);
+
   if (file) formData.append("file", file);
 
   try {
@@ -67,7 +68,9 @@ export default function App() {
       body: formData,
     });
 
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`Server error: ${res.status}`);
+    }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -81,7 +84,9 @@ export default function App() {
 
       for (const line of lines) {
         if (!line.startsWith("data: ")) continue;
+
         const data = line.slice(6).trim();
+
         if (data === "[DONE]") break;
 
         try {
@@ -89,9 +94,7 @@ export default function App() {
           if (parsed.text) {
             setResponse((prev) => prev + parsed.text);
           }
-        } catch {
-          // Skip malformed chunks
-        }
+        } catch {}
       }
     }
   } catch (err) {
