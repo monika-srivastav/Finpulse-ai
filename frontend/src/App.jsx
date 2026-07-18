@@ -47,10 +47,7 @@ export default function App() {
     if (dropped) setFile(dropped);
   };
 
-  const handleAnalyze = async () => {
-  if (!textData.trim() && !file) {
-    alert("Please paste some financial data or upload a file first.");
-    return;const handleAnalyze = async () => {
+ const handleAnalyze = async () => {
   if (!textData.trim() && !file) {
     alert("Please paste some financial data or upload a file first.");
     return;
