@@ -48,57 +48,60 @@ export default function App() {
   };
 
   const handleAnalyze = async () => {
-    if (!textData.trim() && !file) {
-      alert("Please paste some financial data or upload a file first.");
-      return;
-    }
+  if (!textData.trim() && !file) {
+    alert("Please paste some financial data or upload a file first.");
+    return;
+  }
 
-    setIsLoading(true);
-    setResponse("");
+  setIsLoading(true);
+  setResponse("");
 
-    const formData = new FormData();
-    formData.append("text_data", textData);
-    formData.append("query", query);
-    if (file) formData.append("file", file);
+  const formData = new FormData();
+  formData.append("text_data", textData);
+  formData.append("query", query);
+  if (file) formData.append("file", file);
 
-   const res = await fetch("https://finpulse-backend-ai.onrender.com/api/analyze", {
-  method: "POST",
-  body: formData,
-});
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+  try {
+    const res = await fetch("https://finpulse-backend-ai.onrender.com/api/analyze", {
+      method: "POST",
+      body: formData,
+    });
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const data = line.slice(6).trim();
-          if (data === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.text) {
-              setResponse((prev) => prev + parsed.text);
-            }
-          } catch {
-            // skip malformed chunks
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split("\n");
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        const data = line.slice(6).trim();
+        if (data === "[DONE]") break;
+
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.text) {
+            setResponse((prev) => prev + parsed.text);
           }
+        } catch {
+          // Skip malformed chunks
         }
       }
-    } catch (err) {
-      setResponse(
-        "⚠️ Connection Error\n\nCould not reach the backend server.\n\nMake sure:\n• Backend is running on port 8000\n• ANTHROPIC_API_KEY is set in .env\n• Run: uvicorn main:app --reload"
-      );
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (err) {
+    setResponse(
+      "⚠️ Connection Error\n\nCould not reach the backend server.\n\nPlease make sure the Render backend is running."
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleClear = () => {
     setTextData("");
