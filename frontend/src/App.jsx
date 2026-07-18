@@ -61,12 +61,10 @@ export default function App() {
     formData.append("query", query);
     if (file) formData.append("file", file);
 
-    try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        body: formData,
-      });
-
+   const res = await fetch("https://finpulse-backend-ai.onrender.com/api/analyze", {
+  method: "POST",
+  body: formData,
+});
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
       const reader = res.body.getReader();
