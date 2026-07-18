@@ -50,6 +50,9 @@ export default function App() {
   const handleAnalyze = async () => {
   if (!textData.trim() && !file) {
     alert("Please paste some financial data or upload a file first.");
+    return;const handleAnalyze = async () => {
+  if (!textData.trim() && !file) {
+    alert("Please paste some financial data or upload a file first.");
     return;
   }
 
@@ -60,13 +63,18 @@ export default function App() {
   formData.append("text_data", textData);
   formData.append("query", query);
 
-  if (file) formData.append("file", file);
+  if (file) {
+    formData.append("file", file);
+  }
 
   try {
-    const res = await fetch("https://finpulse-backend-ai.onrender.com/api/analyze", {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(
+      "https://finpulse-backend-ai.onrender.com/api/analyze",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     if (!res.ok) {
       throw new Error(`Server error: ${res.status}`);
@@ -77,6 +85,7 @@ export default function App() {
 
     while (true) {
       const { done, value } = await reader.read();
+
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
@@ -87,17 +96,22 @@ export default function App() {
 
         const data = line.slice(6).trim();
 
-        if (data === "[DONE]") break;
+        if (data === "[DONE]") continue;
 
         try {
           const parsed = JSON.parse(data);
+
           if (parsed.text) {
             setResponse((prev) => prev + parsed.text);
           }
-        } catch {}
+        } catch (e) {
+          // Ignore malformed JSON chunks
+        }
       }
     }
   } catch (err) {
+    console.error(err);
+
     setResponse(
       "⚠️ Connection Error\n\nCould not reach the backend server.\n\nPlease make sure the Render backend is running."
     );
